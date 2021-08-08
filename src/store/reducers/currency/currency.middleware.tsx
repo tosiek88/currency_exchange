@@ -5,6 +5,7 @@ import { config, getUrl } from "../../config/config";
 import {
   CurrencyActionType,
   GET_CURRENCY_LIST_SUCCESS,
+  UPDATE_PAIR_SUCCESS,
 } from "./currency.types";
 
 interface Instrument {
@@ -43,13 +44,16 @@ export const getAvaiableList = () => async (
     })
     .sort((a, b) => a.order - b.order)
     .reduce((prev, curr) => {
-      return {...prev, [curr.symbol]:{...curr}}
-    }, {} );
+      return { ...prev, [curr.symbol]: { ...curr } };
+    }, {});
 
-  const allUniqueCurrency = Object.keys(exchangeSymbols).reduce((prev, curr) => {
-    const unique = curr.split("/").filter((s) => !prev.includes(s));
-    return [...prev, ...unique];
-  }, [] as string[]);
+  const allUniqueCurrency = Object.keys(exchangeSymbols).reduce(
+    (prev, curr) => {
+      const unique = curr.split("/").filter((s) => !prev.includes(s));
+      return [...prev, ...unique];
+    },
+    [] as string[]
+  );
 
   dispatch({
     type: GET_CURRENCY_LIST_SUCCESS,
@@ -69,16 +73,29 @@ export const subscribeAllPossibleCurrency = () => async (
   const url = `${getUrl()}/subscribe`;
   const { socket } = getState().WebsocketReducer;
   const { currencyPairs } = getState().CurrencyReducer;
+  const currencyPairsKeys = Object.keys(currencyPairs);
 
-  const { data }= await axios.post(
+  await axios.post(
     url,
-    { pairs: [...Object.keys(currencyPairs)] },
+    { pairs: [...currencyPairsKeys] },
     { ...getHeaders(socket.id) }
   );
 
-  // currencyPairs.forEach((p) => {
-  //   socket.on(`${p}`, (data: any) => {
-  //     // console.debug(data);
-  //   });
-  // });
+  currencyPairsKeys.forEach((p) => {
+    socket.on(`${p}`, (data: any) => {
+      updatePairRate({ [p]: { rate: [...JSON.parse(data).Rates] } })(
+        dispatch,
+        getState
+      );
+    });
+  });
+};
+
+export const updatePairRate = (pair: {
+  [x: string]: { rate: number[] };
+}) => async (
+  dispatch: Dispatch<CurrencyActionType>,
+  getState: () => RootState
+) => {
+  dispatch({ type: UPDATE_PAIR_SUCCESS, payload: pair });
 };

@@ -15,12 +15,19 @@ import { useStyles } from "./display.styles";
 const ExchangeBoard: React.FC = () => {
   const classes = useStyles();
   const currency = useSelector<RootState, string[]>((state) => {
-    console.debug(state.CurrencyReducer);
     return state.CurrencyReducer.avaiableCurrency;
   });
 
+  const value = useSelector<RootState, any>((state) => {
+    return state.CurrencyReducer.currencyPairs;
+  });
+
   const menuItems = currency.map((c) => {
-    return <MenuItem value={c}>{c}</MenuItem>;
+    return (
+      <MenuItem key={c} value={c}>
+        {c}
+      </MenuItem>
+    );
   });
   return (
     <Paper className={classes.root}>
@@ -30,21 +37,24 @@ const ExchangeBoard: React.FC = () => {
       <div className={classes.content}>
         <Grid container spacing={2}>
           <Grid item xs={4} alignContent="center">
-            <FormControl variant="filled" className={classes.formControl}>
-              <InputLabel>Base Currency</InputLabel>
-              <Select id="base-currency" value={menuItems[0]} onChange={() => {}}>
-                {menuItems}
-              </Select>
-            </FormControl>
+            {currency && currency[0] !== "" ? (
+              <FormControl variant="filled" className={classes.formControl}>
+                <InputLabel>Base Currency</InputLabel>
+                <Select
+                  id="base-currency"
+                  value={currency[0]}
+                  onChange={() => {}}
+                >
+                  {menuItems}
+                </Select>
+              </FormControl>
+            ) : null}
           </Grid>
           <Grid item xs={4} alignContent="center"></Grid>
           <Grid item xs={4} alignContent="center"></Grid>
         </Grid>
-        <Typography>
-       Currency Exchange 
-       Ammount 
-        </Typography>
       </div>
+      <div>{JSON.stringify(value, null, 2)}</div>
     </Paper>
   );
 };

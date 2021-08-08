@@ -28,10 +28,6 @@ export const authenticate = () => async (
   });
 
   dispatch({ type: IDLE });
-  socket.on("data", (data: any) => {
-    console.debug(data);
-  });
-
   socket.on("connect_error", (error: Error) => {
     dispatch({ type: ERROR, payload: { error } });
   });
