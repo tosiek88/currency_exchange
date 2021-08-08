@@ -1,9 +1,10 @@
-import { combineReducers, createStore } from "redux";
-import { composeWithDevTools } from 'redux-devtools-extension';
-import { TestReducer } from "./reducer/test.reducer";
+import { applyMiddleware, combineReducers, createStore } from "redux";
+import { composeWithDevTools } from "redux-devtools-extension";
+import { WebsocketReducer } from "./reducers/websocket/websocket.reducer";
+import thunk from "redux-thunk";
 
 const rootReducer = combineReducers({
-  TestReducer: TestReducer,
+  WebsocketReducer: WebsocketReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
@@ -11,6 +12,9 @@ const composeEnhancers = composeWithDevTools({
   trace: true,
   traceLimit: 25,
 });
-const store = createStore(rootReducer, composeEnhancers());
+const store = createStore(
+  rootReducer,
+  composeEnhancers(applyMiddleware(thunk))
+);
 
 export { store };

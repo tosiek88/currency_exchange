@@ -5,7 +5,7 @@ interface TestActionType {
   payload: { test: string };
 }
 
-const TestReducer = (state = {test:'test'}, action: TestActionType) => {
+const TestReducer = (state = { test: "test" }, action: TestActionType) => {
   switch (action.type) {
     //returns updated state
     case "TEST":
