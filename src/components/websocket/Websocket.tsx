@@ -1,17 +1,17 @@
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Authenticate } from "store/reducers/websocket/websocket.middleware";
-import { INIT, WebsocketState } from "store/reducers/websocket/websocket.types";
-import { RootState } from "store/root.reducer";
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { authenticate } from "store/reducers/websocket/websocket.middleware";
+
+const useSetup=()=>{
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(authenticate());
+  }, [dispatch]);
+}
 
 const FxcmSocket: React.FC = () => {
-  const wsState = useSelector<RootState, WebsocketState>(
-    ({ WebsocketReducer }) => WebsocketReducer
-  );
-  const dispatch = useDispatch();
-  if (wsState.currentState === INIT) {
-    dispatch(Authenticate());
-  }
+  useSetup();
+  console.count("Socket");
   return <></>;
 };
 

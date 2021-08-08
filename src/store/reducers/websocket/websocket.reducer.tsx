@@ -1,18 +1,5 @@
-import { WebsocketActions } from "./websocket.types";
+import { AUTHENTICATE_API, CONNECTED, DISCONNECTED, ERROR, IDLE, INIT, WebsocketActions } from "./websocket.types";
 
-// socket.on("connect", async () => {
-//   const url = `${trading_api_proto}://${trading_api_host}:${trading_api_port}/subscribe`;
-//   await axios.post(url, { pairs: "EUR/USD" }, {
-//     headers: {
-//       Authorization: `Bearer ${socket.id}${token}`,
-//       Accept: "application/json",
-//       "Content-Type": "application/x-www-form-urlencoded",
-//     },
-//   } as AxiosRequestConfig);
-//   socket.on("EUR/USD", (data: any) => {
-//     console.debug(data);
-//   });
-// });
 export interface WebsocketState {
   currentState: string;
   socket?: any;
@@ -23,17 +10,19 @@ const WebsocketReducer = (
   action: WebsocketActions
 ): WebsocketState => {
   switch (action.type) {
-    case "INIT":
+    case INIT:
       return { currentState: "INIT" };
-    case "AUTHENTICATE_API": {
+    case AUTHENTICATE_API: {
       return { currentState: "AUTHENTICATE_API" };
     }
-    case "IDLE":
-      return { currentState: "IDLE", socket: action.payload.socket };
-    case "ERROR":
+    case IDLE:
+      return { currentState: "IDLE" };
+    case ERROR:
       return { currentState: "ERROR", error: action.payload.error };
-    case "DISCONNECT":
-      return { currentState: "DISCONNECT", socket: null };
+    case CONNECTED:
+      return { currentState: "CONNECTED", socket: action.payload.socket  };
+    case DISCONNECTED:
+      return { currentState: "DISCONNECTED", socket: null };
     default:
       return state;
   }

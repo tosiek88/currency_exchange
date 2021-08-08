@@ -9,7 +9,7 @@ const App: React.FC = () => {
   const classes = useStyles(theme)();
   return (
     <>
-      <FxcmSocket />
+      <FxcmSocket/>
       <ThemeProvider theme={theme}>
         <div className={classes.app}>
           <Display />

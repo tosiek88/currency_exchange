@@ -2,7 +2,16 @@ export const INIT = "INIT";
 export const AUTHENTICATE_API = "AUTHENTICATE_API";
 export const IDLE = "IDLE";
 export const ERROR = "ERROR";
-export const DISCONNECT = "DISCONNECT";
+export const CONNECTED = "CONNECTED";
+export const DISCONNECTED = "DISCONNECTED";
+
+export type WebsocketStates =
+  | typeof INIT
+  | typeof AUTHENTICATE_API
+  | typeof IDLE
+  | typeof ERROR
+  | typeof CONNECTED
+  | typeof DISCONNECTED;
 
 export interface WebsocketPayloadType {
   socket?: any;
@@ -28,7 +37,7 @@ interface AuthenticateActionType {
 
 interface IdleActionType {
   type: typeof IDLE;
-  payload: WebsocketPayloadType;
+  payload?: WebsocketPayloadType;
 }
 
 interface ErrorActionType {
@@ -36,8 +45,13 @@ interface ErrorActionType {
   payload: WebsocketPayloadType;
 }
 
+interface ConnectedActionType {
+  type: typeof CONNECTED;
+  payload: WebsocketPayloadType;
+}
+
 interface DisconnectActionType {
-  type: typeof DISCONNECT;
+  type: typeof DISCONNECTED;
   payload?: WebsocketPayloadType;
 }
 
@@ -46,4 +60,5 @@ export type WebsocketActions =
   | AuthenticateActionType
   | IdleActionType
   | ErrorActionType
-  | DisconnectActionType;
+  | DisconnectActionType
+  | ConnectedActionType;
