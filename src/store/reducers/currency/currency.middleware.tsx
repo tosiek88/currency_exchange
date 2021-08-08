@@ -42,9 +42,11 @@ export const getAvaiableList = () => async (
       return i.symbol.match(/\//);
     })
     .sort((a, b) => a.order - b.order)
-    .map((i) => i.symbol);
+    .reduce((prev, curr) => {
+      return {...prev, [curr.symbol]:{...curr}}
+    }, {} );
 
-  const allUniqueCurrency = exchangeSymbols.reduce((prev, curr) => {
+  const allUniqueCurrency = Object.keys(exchangeSymbols).reduce((prev, curr) => {
     const unique = curr.split("/").filter((s) => !prev.includes(s));
     return [...prev, ...unique];
   }, [] as string[]);
@@ -65,14 +67,18 @@ export const subscribeAllPossibleCurrency = () => async (
   getState: () => RootState
 ) => {
   const url = `${getUrl()}/subscribe`;
-  const socketId = getState().WebsocketReducer.socket?.id;
-  const pairs = getState().CurrencyReducer.currencyPairs
+  const { socket } = getState().WebsocketReducer;
+  const { currencyPairs } = getState().CurrencyReducer;
 
-  const data = await axios.post(
+  const { data }= await axios.post(
     url,
-    { pairs:[...pairs]},
-    { ...getHeaders(socketId) }
+    { pairs: [...Object.keys(currencyPairs)] },
+    { ...getHeaders(socket.id) }
   );
-  console.debug(data);
-};
 
+  // currencyPairs.forEach((p) => {
+  //   socket.on(`${p}`, (data: any) => {
+  //     // console.debug(data);
+  //   });
+  // });
+};

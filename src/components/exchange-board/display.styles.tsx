@@ -22,4 +22,17 @@ export const useStyles = makeStyles((theme) => ({
     padding: "25px 15px",
     backgroundColor: theme.palette.primary.dark,
   },
+  content: {
+    margin: "50px",
+  },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+    "& .MuiInputBase-root": {
+      background: theme.palette.primary.contrastText,
+    },
+    "& .MuiList-root":{
+      background: theme.palette.primary.contrastText,
+    }
+  },
 }));

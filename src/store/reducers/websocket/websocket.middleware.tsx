@@ -28,7 +28,7 @@ export const authenticate = () => async (
   });
 
   dispatch({ type: IDLE });
-  socket.on("EUR/USD", (data: any) => {
+  socket.on("data", (data: any) => {
     console.debug(data);
   });
 

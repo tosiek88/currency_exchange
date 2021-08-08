@@ -7,14 +7,14 @@ import {
 export interface CurrencyState {
   currentState: string;
   avaiableCurrency: string[];
-  currencyPairs: string[];
+  currencyPairs: {[x:string]:{symbol:string, visible:boolean, order:number}};
   baseCurrenty: string;
 }
 const initState: CurrencyState = {
   currentState: INIT,
   avaiableCurrency: [],
   baseCurrenty: "EUR/USD",
-  currencyPairs: [],
+  currencyPairs: {},
 };
 
 const CurrencyReducer = (
@@ -29,7 +29,7 @@ const CurrencyReducer = (
       return {
         ...state,
         currentState: GET_CURRENCY_LIST_SUCCESS,
-        currencyPairs: [ ...action.payload?.currencyPairs ],
+        currencyPairs: { ...action.payload?.currencyPairs },
         avaiableCurrency: [...action.payload?.avaiableCurrency]
       };
     default:

@@ -7,7 +7,8 @@ interface InitActionType{
 
 interface GetCurrencyListSuccessAction{
   type: typeof GET_CURRENCY_LIST_SUCCESS
-  payload: {avaiableCurrency:string[], currencyPairs:string[]};
+  payload: {avaiableCurrency:string[], 
+  currencyPairs:{[x:string]:{symbol:string, visible:boolean, order:number}}};
 }
 
 export type CurrencyActionType = InitActionType | GetCurrencyListSuccessAction
