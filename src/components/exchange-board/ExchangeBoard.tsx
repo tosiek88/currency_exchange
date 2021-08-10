@@ -168,6 +168,10 @@ const useCurrenciesSelector = (from: string) =>
 const ExchangeBoard: React.FC = () => {
   const classes = useStyles();
   const { from, to }=useSelctedCurrency()
+  const amount = useSelector<RootState, number>((state) => {
+    const amount = state.CurrencyReducer.amount;
+    return isNaN(amount) ? 1 : amount;
+  });
   const { fromCurrencies, toCurrencies } = useMemo(
     () => useCurrenciesSelector,
     []
@@ -237,7 +241,7 @@ const ExchangeBoard: React.FC = () => {
                 <FormControl variant="outlined" className={classes.amountInput}>
                   <OutlinedInput
                     id="filled-basic"
-                    defaultValue={1}
+                    defaultValue={amount||1}
                     startAdornment={
                       <InputAdornment
                         style={{ background: "red" }}
