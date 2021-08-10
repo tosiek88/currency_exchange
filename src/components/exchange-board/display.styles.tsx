@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
 
-export const useStyles = makeStyles((theme) => ({
+export const useStyles = makeStyles((theme: any) => ({
   root: {
     fontFamily: "Roboto",
     color: theme.palette.primary.contrastText,
@@ -27,12 +27,26 @@ export const useStyles = makeStyles((theme) => ({
   },
   formControl: {
     margin: theme.spacing(1),
-    minWidth: 120,
+    minWidth: 150,
     "& .MuiInputBase-root": {
       background: theme.palette.primary.contrastText,
     },
-    "& .MuiList-root":{
+    "& .MuiList-root": {
       background: theme.palette.primary.contrastText,
-    }
+    },
+  },
+  amountInput: {
+    margin: theme.spacing(1),
+    minWidth: 100,
+    width:"150px",
+    "& .MuiInputBase-root": {
+      background: theme.palette.primary.contrastText,
+    },
+    "& .MuiList-root": {
+      background: theme.palette.primary.contrastText,
+    },
+  },
+  inputLabel: {
+    fontSize: "11px",
   },
 }));

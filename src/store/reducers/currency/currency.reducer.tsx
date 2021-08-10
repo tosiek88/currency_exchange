@@ -1,24 +1,22 @@
-import { keys } from "@material-ui/core/styles/createBreakpoints";
 import {
   CurrencyActionType,
   GET_CURRENCY_LIST_SUCCESS,
   INIT,
   UPDATE_PAIR_SUCCESS,
+  SELECT_CURRENCY_SUCCESS,
+  SET_AMOUNT_SUCCESS,
+  CurrencyState,
 } from "./currency.types";
 
-export interface CurrencyState {
-  currentState: string;
-  avaiableCurrency: string[];
-  currencyPairs: {
-    [x: string]: { symbol: string; visible: boolean; order: number };
-  };
-  baseCurrenty: string;
-}
 const initState: CurrencyState = {
   currentState: INIT,
-  avaiableCurrency: [],
+  avaiableCurrency: ["None"],
   baseCurrenty: "EUR/USD",
-  currencyPairs: {},
+  currencyPairs: {
+    "None/None": { symbol: "None/None", visible: true, order: 0, rate:[]},
+  },
+  exchange: { from: "None", to: "None", rate: { sell: 0, buy: 0, ratio: 0 } },
+  amount: 0,
 };
 
 const CurrencyReducer = (
@@ -40,10 +38,25 @@ const CurrencyReducer = (
       const [key, value] = Object.entries(action.payload)[0];
       return {
         ...state,
+        currentState: UPDATE_PAIR_SUCCESS,
         currencyPairs: {
           ...state.currencyPairs,
           [key]: { ...state.currencyPairs[key], ...value },
         },
+      };
+    }
+    case SELECT_CURRENCY_SUCCESS: {
+      return {
+        ...state,
+        currentState: SELECT_CURRENCY_SUCCESS,
+        exchange: action.payload,
+      };
+    }
+    case SET_AMOUNT_SUCCESS: {
+      return {
+        ...state,
+        currentState: SET_AMOUNT_SUCCESS,
+        amount: action.payload.amount,
       };
     }
     default:
