@@ -49,4 +49,10 @@ export const useStyles = makeStyles((theme: any) => ({
   inputLabel: {
     fontSize: "11px",
   },
+  exchangeHeaders:{
+    color: theme.palette.primary.dark
+  },
+  exchangeLabel:{
+    color: theme.palette.secondary.main
+  },
 }));

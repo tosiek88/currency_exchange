@@ -12,11 +12,15 @@ import {
 import React, {
   ChangeEvent,
   PropsWithChildren,
+  ReactEventHandler,
   useMemo,
-  useState,
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Pair } from "store/reducers/currency/currency.types";
+import {
+  Exchange,
+  Pair,
+  SELECT_CURRENCY_SUCCESS,
+} from "store/reducers/currency/currency.types";
 import { RootState } from "store/root.reducer";
 import { useStyles } from "./display.styles";
 import _ from "lodash";
@@ -26,9 +30,10 @@ interface SelectCurrencyType {
   value: string;
 }
 
+export type ChangeEventHandlerType = ChangeEvent<{ value: unknown }>;
+
 interface ExchangePropsType {
-  exchange: { from: string; to: string };
-  amount: number;
+  exchange: { buy: number; sell: number };
 }
 
 export const determineExchange = (from: string, pair: Pair) => {
@@ -46,12 +51,14 @@ export const determineExchange = (from: string, pair: Pair) => {
   }
 };
 
-export const useExchangeSelector = (
-  { from, to } = { from: "None", to: "None" }
-) =>
-  useSelector<RootState, { buy: number; sell: number }>((state) => {
+export const useExchangeSelector = () =>
+  useSelector<
+    RootState,
+    { buy: number; sell: number; from: string; to: string }
+  >((state) => {
+    const { from, to } = state.CurrencyReducer.exchange;
     if (from === "None" || to === "None") {
-      return { buy: 1, sell: 1 };
+      return { buy: 1, sell: 1, from, to };
     }
     const { currencyPairs } = state.CurrencyReducer;
     const entries = Object.entries(currencyPairs);
@@ -61,17 +68,30 @@ export const useExchangeSelector = (
     }) || ["None/None"];
 
     const pair = currencyPairs[key];
-    return determineExchange(from, pair);
+    return { ...determineExchange(from, pair), from, to };
   }, _.isEqual);
 
-const Exchange: React.FC<ExchangePropsType> = ({ exchange, amount }) => {
-  const { buy, sell } = useExchangeSelector(exchange);
-  amount = isNaN(amount) ? 1 : amount;
+const returnEmptyIfNone = (currency: string) =>
+  currency === "None" ? "" : currency;
+
+const ExchangeComponent: React.FC = () => {
+  const { to } = useSelector<RootState, Exchange>(
+    (state) => state.CurrencyReducer.exchange,
+    _.isEqual
+  );
+  const { buy, sell } = useExchangeSelector();
+  const { exchangeHeaders, exchangeLabel } = useStyles();
+  const amount = useSelector<RootState, number>((state) => {
+    const amount = state.CurrencyReducer.amount;
+    return isNaN(amount) ? 1 : amount;
+  });
   return (
     <>
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
-          <Typography variant="h6">Rates: </Typography>
+      <Grid container spacing={0}>
+        <Grid item xs={5}>
+          <Typography className={exchangeHeaders} variant="h6">
+            Rates:{" "}
+          </Typography>
           <Typography variant="subtitle2">
             Buy: {`${buy.toFixed(4)}`}
           </Typography>
@@ -80,13 +100,18 @@ const Exchange: React.FC<ExchangePropsType> = ({ exchange, amount }) => {
           </Typography>
         </Grid>
         <Grid item xs={6}>
-          <Typography variant="h6"> Exchange: </Typography>
-          <Typography variant="subtitle2">
-            Buy: {`${(amount * buy).toFixed(2)}`}
+          <Typography className={exchangeHeaders} variant="h6">
+            {" "}
+            Exchange:{" "}
           </Typography>
-          <Typography variant="subtitle2">
-            Sell: {`${(amount * sell).toFixed(2)}`}
+          <Typography className={exchangeLabel} variant="subtitle2">
+            Buy:{" "}
           </Typography>
+          {`${(amount * buy).toFixed(2)} ${to}`}
+          <Typography className={exchangeLabel} variant="subtitle2">
+            Sell:
+          </Typography>{" "}
+          {`${(amount * sell).toFixed(2)} ${to}`}
         </Grid>
       </Grid>
     </>
@@ -108,6 +133,13 @@ export const SelectCurrency: React.FC<SelectCurrencyType> = ({
     </FormControl>
   );
 };
+
+const useSelctedCurrency = () => 
+  useSelector<RootState, { from: string; to: string }>(
+    (state) => state.CurrencyReducer.exchange,
+    _.isEqual
+  );
+
 
 const useCurrenciesSelector = (from: string) =>
   useSelector<RootState, { fromCurrencies: string[]; toCurrencies: string[] }>(
@@ -135,33 +167,33 @@ const useCurrenciesSelector = (from: string) =>
 
 const ExchangeBoard: React.FC = () => {
   const classes = useStyles();
-  const [exchange, setExchange] = useState({ from: "None", to: "None" });
+  const { from, to }=useSelctedCurrency()
   const { fromCurrencies, toCurrencies } = useMemo(
     () => useCurrenciesSelector,
     []
-  )(exchange.from);
+  )(from);
   const dispatch = useDispatch();
-  const amount = useSelector<RootState, number>(
-    (state) => state.CurrencyReducer.amount
-  );
 
   const setToSelectHandler = (e: ChangeEvent<{ value: unknown }>) => {
-    const { from, to } = exchange;
     const newSelction = {
       from,
       to: String(e.target?.value) || to,
     };
-    setExchange(newSelction);
+    dispatch({ type: SELECT_CURRENCY_SUCCESS, payload: newSelction });
   };
 
   const setFromSelectHandler = (e: ChangeEvent<{ value: unknown }>) => {
-    const { from } = exchange;
     const newSelction = { from: String(e.target?.value) || from, to: "None" };
-    setExchange(newSelction);
+    dispatch({ type: SELECT_CURRENCY_SUCCESS, payload: newSelction });
   };
 
-  const setAmountHandler = (e: ChangeEvent<{ value: unknown }>) =>
+  const setAmountHandlerChange = (e: ChangeEventHandlerType) =>
     setAmount(String(e.target.value));
+
+  const setAmountHandlerLoad: ReactEventHandler<HTMLDivElement> = (e) => {
+    console.debug(e);
+    setAmount(String(e));
+  };
 
   const setAmount = (amount: string) => {
     dispatch({
@@ -187,27 +219,21 @@ const ExchangeBoard: React.FC = () => {
           <div className={classes.content}>
             <Grid container spacing={1}>
               <Grid item xs={5}>
-                <SelectCurrency
-                  onChange={setFromSelectHandler}
-                  value={exchange.from}
-                >
+                <SelectCurrency onChange={setFromSelectHandler} value={from}>
                   {menuItems(fromCurrencies)}
                 </SelectCurrency>
               </Grid>
               <Grid item xs={2}></Grid>
               <Grid item xs={5}>
-                <SelectCurrency
-                  onChange={setToSelectHandler}
-                  value={exchange.to}
-                >
+                <SelectCurrency onChange={setToSelectHandler} value={to}>
                   {menuItems(toCurrencies)}
                 </SelectCurrency>
               </Grid>
             </Grid>
           </div>
           <div className={classes.content}>
-            <Grid container spacing={4}>
-              <Grid item xs={6}>
+            <Grid container spacing={3}>
+              <Grid item xs={5}>
                 <FormControl variant="outlined" className={classes.amountInput}>
                   <OutlinedInput
                     id="filled-basic"
@@ -217,15 +243,16 @@ const ExchangeBoard: React.FC = () => {
                         style={{ background: "red" }}
                         position="start"
                       >
-                        {exchange.from}{" "}
+                        {returnEmptyIfNone(from)}{" "}
                       </InputAdornment>
                     }
-                    onChange={setAmountHandler}
+                    onChange={setAmountHandlerChange}
+                    onLoad={setAmountHandlerLoad}
                   />
                 </FormControl>
               </Grid>
-              <Grid item xs={6}>
-                <Exchange exchange={exchange} amount={amount} />
+              <Grid item xs={7}>
+                <ExchangeComponent />
               </Grid>
             </Grid>
           </div>
