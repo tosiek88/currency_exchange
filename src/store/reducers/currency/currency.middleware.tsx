@@ -3,11 +3,8 @@ import { Dispatch } from "redux";
 import { RootState } from "store/root.reducer";
 import { config, getUrl } from "../../config/config";
 import {
-  ApiPair,
   CurrencyActionType,
   GET_CURRENCY_LIST_SUCCESS,
-  Pair,
-  SELECT_CURRENCY_SUCCESS,
   UPDATE_PAIR_SUCCESS,
 } from "./currency.types";
 
@@ -69,44 +66,6 @@ export const getAvaiableList = () => async (
   subscribeAllPossibleCurrency()(dispatch, getState);
 };
 
-export const determineExchange = (from: string, pair: Pair) => {
-  const key = Object.keys(pair)[0];
-  const currencies = key.split("/");
-  const index = currencies.indexOf(from);
-  if (index === 0) {
-    return { buy: pair[key].rate[0], sell: pair[key].rate[0] };
-  } else {
-    return { buy: 1 / pair[key].rate[0], sell: 1 / pair[key].rate[0] };
-  }
-};
-
-export const SelectCurrencyAction = (
-  { from, to } = { from: "None", to: "None" }
-) => async (
-  dispatch: Dispatch<CurrencyActionType>,
-  getState: () => RootState
-) => {
-  if (from === "None" || to === "None") {
-    dispatch({
-      type: SELECT_CURRENCY_SUCCESS,
-      payload: { from, to, rate: { buy: 0, sell: 0, ratio: 0 } },
-    });
-    return;
-  }
-
-  const entries = Object.entries(getState().CurrencyReducer.currencyPairs);
-
-  const [key] =
-    entries.find(([key]) => {
-      return key.includes(from) && key.includes(to);
-    }) || [];
-  }
-
-
-  // const pair = getState().CurrencyReducer.currencyPairs[key];
-  // determineExchange(from, pair)
-};
-
 export const subscribeAllPossibleCurrency = () => async (
   dispatch: Dispatch<CurrencyActionType>,
   getState: () => RootState
@@ -123,25 +82,20 @@ export const subscribeAllPossibleCurrency = () => async (
   );
 
   data.pairs.forEach((pair: { Symbol: string; Rates: number[] }) => {
-    updatePairRate({ [pair.Symbol]: { rate: [...pair.Rates] } })(
-      dispatch,
-      getState
-    );
+    updatePairRate({ [pair.Symbol]: { rate: [...pair.Rates] } })(dispatch);
   });
 
   currencyPairsKeys.forEach((p) => {
     socket.on(`${p}`, (data: any) => {
-      // updatePairRate({ [p]: { rate: [...JSON.parse(data).Rates] } })(
-      //   dispatch,
-      //   getState
-      // );
+      updatePairRate({ [p]: { rate: [...JSON.parse(data).Rates] } })(
+        dispatch,
+      );
     });
   });
 };
 
-export const updatePairRate = (pair: Pair) => async (
-  dispatch: Dispatch<CurrencyActionType>,
-  getState: () => RootState
-) => {
+export const updatePairRate = (pair: {
+  [x: string]: { rate: number[] };
+}) => async (dispatch: Dispatch<CurrencyActionType>) => {
   dispatch({ type: UPDATE_PAIR_SUCCESS, payload: pair });
 };

@@ -16,7 +16,7 @@ const initState: CurrencyState = {
     "None/None": { symbol: "None/None", visible: true, order: 0, rate:[]},
   },
   exchange: { from: "None", to: "None", rate: { sell: 0, buy: 0, ratio: 0 } },
-  amount: 0,
+  amount: 1,
 };
 
 const CurrencyReducer = (
@@ -41,7 +41,7 @@ const CurrencyReducer = (
         currentState: UPDATE_PAIR_SUCCESS,
         currencyPairs: {
           ...state.currencyPairs,
-          [key]: { ...state.currencyPairs[key], ...value },
+          [key]: { ...state.currencyPairs[key], rate:[...value.rate] },
         },
       };
     }
