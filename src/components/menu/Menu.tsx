@@ -12,13 +12,9 @@ export const Menu = () => {
     <>
       <Router>
         <Paper className={classes.root}>
-          <Tabs indicatorColor="secondary" textColor="primary" centered>
-            <Link to="/exchange-currency">
-              <Tab label="Exchange Currency " />
-            </Link>
-            <Link to="/exchange-board">
-              <Tab label="Exchange Board" />
-            </Link>
+          <Tabs indicatorColor="secondary" textColor="primary" centered value={false}>
+              <Tab label="Exchange Currency" component={Link} to="/exchange-currency"/>
+              <Tab label="Exchange Board" component={Link} to="/exchange-board"/>
           </Tabs>
         </Paper>
 

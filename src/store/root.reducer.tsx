@@ -42,7 +42,6 @@ const persistedStore = () => {
   return undefined;
 };
 
-console.debug(persistedStore());
 const store = createStore(
   rootReducer,
   persistedStore(),
