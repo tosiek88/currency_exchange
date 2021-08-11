@@ -3,6 +3,7 @@ export const GET_CURRENCY_LIST_SUCCESS = "GET_CURRENCY_LIST_SUCCESS";
 export const UPDATE_PAIR_SUCCESS = "UPDATE_PAIR_SUCCESS";
 export const SELECT_CURRENCY_SUCCESS = "SELECT_CURRENCY_SUCCESS";
 export const SET_AMOUNT_SUCCESS = "SET_AMOUNT_SUCCESS";
+export const SELECT_BASE_CURRENCY_SUCCESS = "SELECT_BASE_CURRENCY_SUCCESS";
 
 export interface ApiPair {
   [x: string]: {
@@ -24,7 +25,7 @@ export interface CurrencyState {
   currentState: string;
   avaiableCurrency: string[];
   currencyPairs: ApiPair;
-  baseCurrenty: string;
+  baseCurrency: string;
   exchange: Exchange;
   amount: number;
 }
@@ -63,6 +64,11 @@ interface SelectCurrencySuccessAction {
   payload: Exchange;
 }
 
+interface SelectBaseCurrencySuccess{
+  type: typeof SELECT_BASE_CURRENCY_SUCCESS;
+  payload: string;
+}
+
 interface SetAmountSuccessAction {
   type: typeof SET_AMOUNT_SUCCESS;
   payload: { amount: number };
@@ -73,4 +79,5 @@ export type CurrencyActionType =
   | GetCurrencyListSuccessAction
   | UpdatePairSuccessAction
   | SelectCurrencySuccessAction
-  | SetAmountSuccessAction;
+  | SetAmountSuccessAction
+  | SelectBaseCurrencySuccess;

@@ -1,15 +1,13 @@
 import _ from "lodash";
 import { useSelector } from "react-redux";
-import { Pair } from "store/reducers/currency/currency.types";
+import { ApiPair, Pair } from "store/reducers/currency/currency.types";
 import { RootState } from "store/root.reducer";
 
-
-export const useSelctedCurrency = () => 
+export const useSelctedCurrency = () =>
   useSelector<RootState, { from: string; to: string }>(
     (state) => state.CurrencyReducer.exchange,
     _.isEqual
   );
-
 
 export const useCurrenciesSelector = (from: string) =>
   useSelector<RootState, { fromCurrencies: string[]; toCurrencies: string[] }>(
@@ -35,25 +33,38 @@ export const useCurrenciesSelector = (from: string) =>
     _.isEqual
   );
 
+const getPair = (from: string, to:string, currencyPairs: ApiPair) => {
+  const entries = Object.entries(currencyPairs);
+  const [key] = entries.find(([key]) => {
+    return key.includes(from) && key.includes(to);
+  }) || ["None/None"];
+
+  return currencyPairs[key];
+};
+
 export const useExchangeSelector = () =>
-  useSelector<
-    RootState,
-    { buy: number; sell: number; from: string; to: string }
+  useSelector<RootState,{ buy: number; sell: number; from: string; to: string }
   >((state) => {
     const { from, to } = state.CurrencyReducer.exchange;
+    if (from === "None" || to === "None") {
+        return { buy: 1, sell: 1, from, to };
+    }
+  const { currencyPairs } = state.CurrencyReducer;
+    const pair = getPair(from,to, currencyPairs);
+    return { ...determineExchange(from, pair), from, to };
+  }, _.isEqual);
+
+
+export const useRatioSelector = ({ from, to }: { from: string; to: string }) =>
+  useSelector<RootState, { buy: number; sell: number }>((state) => {
     if (from === "None" || to === "None") {
       return { buy: 1, sell: 1, from, to };
     }
     const { currencyPairs } = state.CurrencyReducer;
-    const entries = Object.entries(currencyPairs);
-
-    const [key] = entries.find(([key]) => {
-      return key.includes(from) && key.includes(to);
-    }) || ["None/None"];
-
-    const pair = currencyPairs[key];
+    const pair = getPair(from, to, currencyPairs);
     return { ...determineExchange(from, pair), from, to };
   }, _.isEqual);
+
 
 
 export const returnEmptyIfNone = (currency: string) =>
@@ -68,8 +79,8 @@ export const determineExchange = (from: string, pair: Pair) => {
   const rate = pair.rate || [];
 
   if (index === 0) {
-    return { buy: rate[0], sell: rate[1] };
+    return { buy: rate[1], sell: rate[0] };
   } else {
-    return { buy: 1 / rate[0], sell: 1 / rate[1] };
+    return { buy: 1 / rate[1], sell: 1 / rate[0] };
   }
 };

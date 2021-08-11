@@ -1,6 +1,6 @@
-import { Grid, Typography } from "@material-ui/core";
+import { Grid, TableCell, TableRow, Typography } from "@material-ui/core";
 import { useStyles } from "./exchange.styles";
-import { useExchangeSelector } from "hooks/selectors";
+import { useExchangeSelector, useRatioSelector } from "hooks/selectors";
 import _ from "lodash";
 import { useSelector } from "react-redux";
 import { Exchange } from "store/reducers/currency/currency.types";
@@ -50,3 +50,21 @@ export const ExchangeComponent: React.FC = () => {
   );
 };
 
+export interface ExchangeRowProps {
+  from: string;
+  to: string;
+}
+export const ExchangeRow: React.FC<ExchangeRowProps> = ({
+  from,
+  to,
+}: ExchangeRowProps) => {
+  const { buy, sell } = useRatioSelector({ from, to });
+  // const { exchangeHeaders, exchangeLabel } = useStyles();
+  return (
+    <TableRow>
+      <TableCell align="right">{to}</TableCell>
+      <TableCell align="right">{buy.toFixed(2)}</TableCell>
+      <TableCell align="right">{sell.toFixed(2)}</TableCell>
+    </TableRow>
+  );
+};

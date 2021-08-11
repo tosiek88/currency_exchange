@@ -33,7 +33,7 @@ export const Amount: React.FC = () => {
         id="filled-basic"
         defaultValue={amount || 1}
         startAdornment={
-          <InputAdornment style={{ background: "red" }} position="start">
+          <InputAdornment position="start">
             {returnEmptyIfNone(from)}{" "}
           </InputAdornment>
         }

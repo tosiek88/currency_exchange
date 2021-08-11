@@ -3,7 +3,7 @@ import React from "react";
 import { FxcmSocket } from "./components/fxcm-socket/FxcmSocket";
 import theme from "./theme";
 import { useStyles } from "./app.styles";
-import ExchangeBoard from "./components/exchange-board/ExchangeBoard";
+import { Menu } from "./components/menu/Menu";
 
 const App: React.FC = () => {
   const classes = useStyles(theme)();
@@ -12,7 +12,7 @@ const App: React.FC = () => {
       <FxcmSocket />
       <ThemeProvider theme={theme}>
         <div className={classes.app}>
-          <ExchangeBoard />
+          <Menu />
         </div>
       </ThemeProvider>
     </>

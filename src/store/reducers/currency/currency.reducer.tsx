@@ -6,12 +6,13 @@ import {
   SELECT_CURRENCY_SUCCESS,
   SET_AMOUNT_SUCCESS,
   CurrencyState,
+  SELECT_BASE_CURRENCY_SUCCESS,
 } from "./currency.types";
 
 const initState: CurrencyState = {
   currentState: INIT,
   avaiableCurrency: ["None"],
-  baseCurrenty: "EUR/USD",
+  baseCurrency: "USD",
   currencyPairs: {
     "None/None": { symbol: "None/None", visible: true, order: 0, rate:[]},
   },
@@ -50,6 +51,13 @@ const CurrencyReducer = (
         ...state,
         currentState: SELECT_CURRENCY_SUCCESS,
         exchange: action.payload,
+      };
+    }
+    case SELECT_BASE_CURRENCY_SUCCESS:{
+      return {
+        ...state,
+        currentState: SELECT_BASE_CURRENCY_SUCCESS,
+        baseCurrency: action.payload,
       };
     }
     case SET_AMOUNT_SUCCESS: {

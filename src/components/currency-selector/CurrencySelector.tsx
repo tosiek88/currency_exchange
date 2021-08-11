@@ -6,12 +6,13 @@ import {useStyles} from './currency-selector.styles'
 export const CurrencySelector: React.FC<SelectCurrencyType> = ({
   onChange,
   value,
+  label,
   children,
 }: PropsWithChildren<SelectCurrencyType>) => {
   const classes = useStyles();
   return (
     <FormControl variant="filled" className={classes.formControl}>
-      <InputLabel className={classes.inputLabel}>Select Currency</InputLabel>
+      <InputLabel className={classes.inputLabel}>{label?label:'Select Currency'}</InputLabel>
       <Select id="base-currency" value={value} onChange={onChange}>
         {children}
       </Select>
