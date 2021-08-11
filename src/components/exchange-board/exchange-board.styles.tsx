@@ -35,24 +35,4 @@ export const useStyles = makeStyles((theme: any) => ({
       background: theme.palette.primary.contrastText,
     },
   },
-  amountInput: {
-    margin: theme.spacing(1),
-    minWidth: 100,
-    width:"150px",
-    "& .MuiInputBase-root": {
-      background: theme.palette.primary.contrastText,
-    },
-    "& .MuiList-root": {
-      background: theme.palette.primary.contrastText,
-    },
-  },
-  inputLabel: {
-    fontSize: "11px",
-  },
-  exchangeHeaders:{
-    color: theme.palette.primary.dark
-  },
-  exchangeLabel:{
-    color: theme.palette.secondary.main
-  },
 }));
